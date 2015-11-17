@@ -28,16 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.tvProcess = new System.Windows.Forms.TreeView();
             this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // treeView1
+            // tvProcess
             // 
-            this.treeView1.Location = new System.Drawing.Point(45, 32);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(624, 497);
-            this.treeView1.TabIndex = 0;
+            this.tvProcess.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.tvProcess.Location = new System.Drawing.Point(45, 32);
+            this.tvProcess.Name = "tvProcess";
+            this.tvProcess.Size = new System.Drawing.Size(624, 497);
+            this.tvProcess.TabIndex = 0;
+            this.tvProcess.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvProcess_NodeMouseDoubleClick);
             // 
             // button1
             // 
@@ -55,7 +57,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(854, 559);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.treeView1);
+            this.Controls.Add(this.tvProcess);
             this.Name = "MainForm";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -64,7 +66,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView tvProcess;
         private System.Windows.Forms.Button button1;
     }
 }

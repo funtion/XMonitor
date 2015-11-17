@@ -20,18 +20,18 @@ namespace XMonitor
         private void button1_Click(object sender, EventArgs e)
         {
             List<Proc> tree = Proc.getProcessTree();
-            treeView1.Nodes.Clear();
+            tvProcess.Nodes.Clear();
             foreach (Proc proc in tree)
             {
-                treeView1.Nodes.Add(buildTreeNode(proc));
+                tvProcess.Nodes.Add(buildTreeNode(proc));
             }
-            treeView1.ExpandAll();
+            tvProcess.ExpandAll();
         }
 
         private TreeNode buildTreeNode(Proc proc)
         {
-            var res = new TreeNode(string.Format("{0} ({1})",proc.processName,proc.processId));
-           
+            var res = new TreeNode(string.Format("{0} ({1}) - {2}",proc.processName,proc.processId,proc.connections.Count));
+            res.Name = string.Format("{0}", proc.processId);
             foreach(Proc child in proc.children)
             {
                 res.Nodes.Add(buildTreeNode(child));
@@ -39,5 +39,14 @@ namespace XMonitor
             return res;
         }
 
+
+        private void tvProcess_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            int pid = Int32.Parse(e.Node.Name);
+            var pf = new ProcessForm(pid);
+            pf.Show();
+        }
+
     }
 }
+ 
