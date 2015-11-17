@@ -17,6 +17,7 @@ namespace XMonitor
         [STAThread]
         static void Main()
         {
+            ProcessConnection p = new ProcessConnection();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
