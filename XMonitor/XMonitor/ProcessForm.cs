@@ -13,11 +13,13 @@ using PacketDotNet;
 
 namespace XMonitor
 {
+
     public partial class ProcessForm : Form
     {
         public int pid;
         public Process process;
         private const int readTimeoutMilliseconds = 1000;
+        private CaptureDeviceList devices = CaptureDeviceList.Instance;
         public ProcessForm(int pid)
         {
             this.pid = pid;
@@ -34,7 +36,7 @@ namespace XMonitor
         {
             Text = string.Format("Process: {0} ({1})", process.ProcessName, process.Id);
 
-            var devices = CaptureDeviceList.Instance;
+            
             var connectsions = new ProcessConnection().getConnectionByPID(pid);
             var filter = "";
             foreach(var con in connectsions)
@@ -61,31 +63,67 @@ namespace XMonitor
         private delegate void delAddPackageToView(CaptureEventArgs packet);
         private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
         {
+            if (IsDisposed)
+                return;
             this.Invoke(new delAddPackageToView(addPackageToView), packet);
+           
         }
 
         private void addPackageToView(CaptureEventArgs captureEventArgs)
         {
             var packet = Packet.ParsePacket(captureEventArgs.Packet.LinkLayerType, captureEventArgs.Packet.Data);
 
-            var tcpPacket = TcpPacket.GetEncapsulated(packet);
-            var item = new ListViewItem();
-            item.SubItems.Add(captureEventArgs.Packet.Timeval.MicroSeconds.ToString());
-            item.SubItems.Add(captureEventArgs.Packet.Data.Length.ToString());
-            if(tcpPacket != null)
+            var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
+            if( ipV4Packet != null)
             {
-                item.SubItems.Add("TCP");
-            }
-            else
-            {
-                var udpPacket = PacketDotNet.UdpPacket.GetEncapsulated(packet);
-                if(udpPacket != null)
+                var data = new List<string>();
+
+                var time = captureEventArgs.Packet.Timeval;
+                
+                var tcpPacket = (TcpPacket)packet.Extract(typeof(TcpPacket));
+                if (tcpPacket != null)
                 {
-                    item.SubItems.Add("UDP");
+                    data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
+                    data.Add(captureEventArgs.Packet.Data.Length.ToString());
+                    data.Add("TCP");
+                    data.Add(ipV4Packet.SourceAddress.ToString());
+                    data.Add(tcpPacket.SourcePort.ToString());
+                    data.Add(ipV4Packet.DestinationAddress.ToString());
+                    data.Add(tcpPacket.DestinationPort.ToString());
+                    
                 }
+                else
+                {
+                    var udpPacket = (UdpPacket)packet.Extract(typeof(UdpPacket));
+                    if (udpPacket != null)
+                    {
+                        data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
+                        data.Add(captureEventArgs.Packet.Data.Length.ToString());
+                        data.Add("UDP");
+                        data.Add(ipV4Packet.SourceAddress.ToString());
+                        data.Add(udpPacket.SourcePort.ToString());
+                        data.Add(ipV4Packet.DestinationAddress.ToString());
+                        data.Add(udpPacket.DestinationPort.ToString());
+                    }
+                }
+                
+
+                listView1.Items.Add(new ListViewItem(data.ToArray()));
+                listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
+
+               
             }
             
-            listView1.Items.Add(item);
+        }
+
+        private void ProcessForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            foreach (ICaptureDevice dev in devices)
+            {   
+                //dev.Close();       
+                //dev.StopCapture();
+                
+            }
         }
 
     }

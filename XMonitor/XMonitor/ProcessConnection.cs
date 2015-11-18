@@ -24,12 +24,22 @@ namespace XMonitor
         
         private string getPort(string s)
         {
-            return s.Split(':').Last();
+            s =  s.Split(':').Last();
+            if(s.Equals("*"))
+            {
+                s = "0";
+            }
+            return s;
         }
 
         private string getIp(string s)
         {
-            return s.Substring(0, s.LastIndexOf(':'));
+            s =  s.Substring(0, s.LastIndexOf(':'));
+            if(s.Equals("*"))
+            {
+                s = "0.0.0.0";
+            }
+            return s;
         }
 
         public ProcessConnection() 
