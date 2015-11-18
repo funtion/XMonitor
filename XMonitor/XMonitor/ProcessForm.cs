@@ -20,6 +20,7 @@ namespace XMonitor
         public Process process;
         private const int readTimeoutMilliseconds = 1000;
         private CaptureDeviceList devices = CaptureDeviceList.Instance;
+        private List<CaptureEventArgs> capturedEvens = new List<CaptureEventArgs>();
         public ProcessForm(int pid)
         {
             this.pid = pid;
@@ -36,53 +37,53 @@ namespace XMonitor
         {
             Text = string.Format("Process: {0} ({1})", process.ProcessName, process.Id);
 
-            
+
             var connectsions = new ProcessConnection().getConnectionByPID(pid);
             var filter = "";
-            foreach(var con in connectsions)
+            foreach (var con in connectsions)
             {
-                
-                filter += string.Format("( {0} and src host {1} and src port {2} and dst host {3} and dst port {4})",con.type.ToLower(),con.inIp,con.inPort,con.outIp,con.outPort);
-                if(!con.Equals(connectsions.Last()))
+
+                filter += string.Format("( {0} and src host {1} and src port {2} and dst host {3} and dst port {4})", con.type.ToLower(), con.inIp, con.inPort, con.outIp, con.outPort);
+                if (!con.Equals(connectsions.Last()))
                 {
                     filter += " or ";
                 }
             }
-            
-            foreach(ICaptureDevice dev in devices)
+
+            foreach (ICaptureDevice dev in devices)
             {
                 dev.OnPacketArrival += new SharpPcap.PacketArrivalEventHandler(device_OnPacketArrival);
-                
+
                 dev.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
                 dev.Filter = filter;
                 dev.StartCapture();
             }
 
-            
+
         }
-        private delegate void delAddPackageToView(CaptureEventArgs packet);
+        private delegate void handlePackageDelegate(CaptureEventArgs packet);
         private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
         {
             if (IsDisposed)
                 return;
-            this.Invoke(new delAddPackageToView(addPackageToView), packet);
-           
+            this.Invoke(new handlePackageDelegate(handlePackage), packet);
+
         }
 
-        private void addPackageToView(CaptureEventArgs captureEventArgs)
+        private void handlePackage(CaptureEventArgs captureEventArgs)
         {
+            
             var packet = Packet.ParsePacket(captureEventArgs.Packet.LinkLayerType, captureEventArgs.Packet.Data);
 
             var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
-            if( ipV4Packet != null)
+            if (ipV4Packet != null)
             {
                 var data = new List<string>();
-
                 var time = captureEventArgs.Packet.Timeval;
-                
                 var tcpPacket = (TcpPacket)packet.Extract(typeof(TcpPacket));
                 if (tcpPacket != null)
                 {
+                    capturedEvens.Add(captureEventArgs);
                     data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
                     data.Add(captureEventArgs.Packet.Data.Length.ToString());
                     data.Add("TCP");
@@ -90,13 +91,16 @@ namespace XMonitor
                     data.Add(tcpPacket.SourcePort.ToString());
                     data.Add(ipV4Packet.DestinationAddress.ToString());
                     data.Add(tcpPacket.DestinationPort.ToString());
-                    
+                    listView1.Items.Add(new ListViewItem(data.ToArray()));
+                    listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
+
                 }
                 else
                 {
                     var udpPacket = (UdpPacket)packet.Extract(typeof(UdpPacket));
                     if (udpPacket != null)
                     {
+                        capturedEvens.Add(captureEventArgs);
                         data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
                         data.Add(captureEventArgs.Packet.Data.Length.ToString());
                         data.Add("UDP");
@@ -104,25 +108,38 @@ namespace XMonitor
                         data.Add(udpPacket.SourcePort.ToString());
                         data.Add(ipV4Packet.DestinationAddress.ToString());
                         data.Add(udpPacket.DestinationPort.ToString());
+                        listView1.Items.Add(new ListViewItem(data.ToArray()));
+                        listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
                     }
+
                 }
+
+
                 
 
-                listView1.Items.Add(new ListViewItem(data.ToArray()));
-                listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
 
-               
             }
-            
+
         }
 
         private void ProcessForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             foreach (ICaptureDevice dev in devices)
-            {   
+            {
                 //dev.Close();       
                 //dev.StopCapture();
-                
+
+            }
+        }
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                var id = listView1.SelectedIndices[0];
+                var capture = capturedEvens[id];
+                var packetForm = new PacketForm(capture);
+                packetForm.Show();
             }
         }
 
