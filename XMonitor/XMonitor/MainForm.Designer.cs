@@ -39,6 +39,7 @@
             this.tvProcess.Name = "tvProcess";
             this.tvProcess.Size = new System.Drawing.Size(624, 497);
             this.tvProcess.TabIndex = 0;
+            this.tvProcess.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvProcess_BeforeCollapse);
             this.tvProcess.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvProcess_NodeMouseDoubleClick);
             // 
             // button1
