@@ -82,6 +82,7 @@
     <Compile Include="PacketForm.Designer.cs">
       <DependentUpon>PacketForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="PacketStatic.cs" />
     <Compile Include="Proc.cs" />
     <Compile Include="ProcessForm.cs">
       <SubType>Form</SubType>

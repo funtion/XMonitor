@@ -8,6 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Timers;
+using SharpPcap;
+using SharpPcap.WinPcap;
+using PacketDotNet;
+
 
 namespace XMonitor
 {
@@ -21,6 +26,10 @@ namespace XMonitor
 
         private const int SB_HORZ = 0x0;
         private const int SB_VERT = 0x1;
+        private const int readTimeoutMilliseconds = 1000;
+
+        private PacketStatistic statistic = new PacketStatistic();
+
 
         private Point GetTreeViewScrollPos(TreeView treeView)
         {
@@ -39,28 +48,40 @@ namespace XMonitor
         public MainForm()
         {
             InitializeComponent();
+
+            
+
+
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void updateProcessTree(object sender, ElapsedEventArgs e)
         {
-            List<Proc> tree = Proc.getProcessTree();
-            var pos = new Point(
-                GetScrollPos((int)tvProcess.Handle, SB_HORZ),
-                GetScrollPos((int)tvProcess.Handle, SB_VERT)
-                );
-            tvProcess.BeginUpdate();
-            tvProcess.Nodes.Clear();
-            foreach (Proc proc in tree)
-            {
-                tvProcess.Nodes.Add(buildTreeNode(proc));
-            }
-            tvProcess.ExpandAll();
-            
-            tvProcess.EndUpdate();
-            
-            SetScrollPos((IntPtr)tvProcess.Handle, SB_VERT, pos.Y, true);
+            if (IsDisposed)
+                return;
+            this.Invoke(new Action(
+                    () =>
+                    {
+                        
+                        List<Proc> tree = Proc.getProcessTree();
+                        var pos = new Point(
+                            GetScrollPos((int)tvProcess.Handle, SB_HORZ),
+                            GetScrollPos((int)tvProcess.Handle, SB_VERT)
+                            );
+                        tvProcess.BeginUpdate();
+                        tvProcess.Nodes.Clear();
+                        foreach (Proc proc in tree)
+                        {
+                            tvProcess.Nodes.Add(buildTreeNode(proc));
+                        }
+                        tvProcess.ExpandAll();
 
+                        tvProcess.EndUpdate();
+
+                        SetScrollPos((IntPtr)tvProcess.Handle, SB_VERT, pos.Y, true);
+                    }
+                ));
         }
+
 
         private TreeNode buildTreeNode(Proc proc)
         {
@@ -82,11 +103,58 @@ namespace XMonitor
             pf.Show();
 
             
+            
+        }
+
+        private void device_OnPcapStatistics(object sender, StatisticsModeEventArgs e)
+        {
+            statistic.update(e);
+            if (IsDisposed)
+                return;
+            this.Invoke(new Action(
+                    () =>
+                    {
+                        lvStatistic.BeginUpdate();
+                        var items = lvStatistic.Items;
+                        items.Clear();
+                        
+                        items.Add(new ListViewItem(new [] {"packet received", statistic.packetReceivedNum.ToString()}));
+                        items.Add(new ListViewItem(new [] { "pps", statistic.pps.ToString()}));
+                        items.Add(new ListViewItem(new[] { "data received (byte)", statistic.packetReceiveSize.ToString() }));
+                        items.Add(new ListViewItem(new[] { "bps", statistic.bps.ToString() }));
+                        lvStatistic.EndUpdate();
+                    }
+                ));
+
+
+        }
+
+        private void device_OnPacketArrival(object sender, CaptureEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void tvProcess_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
             e.Cancel = true;
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            var timer = new System.Timers.Timer(1234);
+            timer.Elapsed += updateProcessTree;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+
+            var list = WinPcapDeviceList.Instance;
+            foreach (var dev in list)
+            {
+                dev.OnPcapStatistics += new StatisticsModeEventHandler(device_OnPcapStatistics);
+                dev.Open();
+                dev.Filter = "tcp or udp";
+                dev.Mode = CaptureMode.Statistics;
+                dev.StartCapture();
+            }
         }
 
     }
