@@ -29,8 +29,9 @@ namespace XMonitor
         private const int readTimeoutMilliseconds = 1000;
 
         private PacketStatistic statistic = new PacketStatistic();
-
-
+        private WinPcapDeviceList winPcapDeviceList = WinPcapDeviceList.Instance;
+        //private List<Tuple<double, double>> factor = new List<Tuple<double, double>>();
+        //private Tuple<double, double> parentSize;
         private Point GetTreeViewScrollPos(TreeView treeView)
         {
             return new Point(
@@ -49,9 +50,18 @@ namespace XMonitor
         {
             InitializeComponent();
 
+            //parentSize = new Tuple<double, double>(Size.Width, Size.Height);
             
-
-
+            Tag = new Size(Size.Width, Size.Height);
+            
+            foreach (Control ctrl in this.Controls)
+            {
+                //factor.Add(new Tuple<double, double>(ctrl.Location.X / (double)Size.Width, ctrl.Location.Y / (double)Size.Height));
+                ctrl.Tag = new Tuple<Tuple<double, double>,Size>(
+                    new Tuple<double, double>(ctrl.Location.X / (double)Size.Width, ctrl.Location.Y / (double)Size.Height),
+                    ctrl.Size);
+            }
+            
         }
 
         private void updateProcessTree(object sender, ElapsedEventArgs e)
@@ -85,7 +95,16 @@ namespace XMonitor
 
         private TreeNode buildTreeNode(Proc proc)
         {
-            var res = new TreeNode(string.Format("{0} ({1}) - {2}",proc.processName,proc.processId,proc.connections.Count));
+            string info;
+            if (proc.connections.Count == 0)
+            {
+                info = string.Format("{0} (pid:{1})", proc.processName, proc.processId); 
+            }
+            else
+            {
+                info = string.Format("{0} (pid :{1} - {2} connections )", proc.processName, proc.processId, proc.connections.Count);
+            }
+            var res = new TreeNode(info);
             res.Name = string.Format("{0}", proc.processId);
             foreach(Proc child in proc.children)
             {
@@ -117,11 +136,31 @@ namespace XMonitor
                         lvStatistic.BeginUpdate();
                         var items = lvStatistic.Items;
                         items.Clear();
-                        
-                        items.Add(new ListViewItem(new [] {"packet received", statistic.packetReceivedNum.ToString()}));
-                        items.Add(new ListViewItem(new [] { "pps", statistic.pps.ToString()}));
-                        items.Add(new ListViewItem(new[] { "data received (byte)", statistic.packetReceiveSize.ToString() }));
-                        items.Add(new ListViewItem(new[] { "bps", statistic.bps.ToString() }));
+                        foreach(var v in statistic.devs)
+                        {
+                            var dev = v.Key;
+                            var data = v.Value;
+                            var friendlyName = ((WinPcapDevice)dev).Interface.FriendlyName;
+                            items.Add(new ListViewItem(
+                                    new[] { 
+                                    friendlyName,
+                                    data.packetReceivedNum.ToString(),
+                                    data.pps.ToString(),
+                                    data.packetReceiveSize.ToString(),
+                                    data.bps.ToString()
+                                    }));
+                        }
+    
+                        items.Add(new ListViewItem(
+                                    new[] { 
+                                    "Total",
+                                    statistic.packetReceivedNum.ToString(),
+                                    statistic.pps.ToString(),
+                                    statistic.packetReceiveSize.ToString(),
+                                    statistic.bps.ToString()
+                                    }));
+                        lvStatistic.Columns[0].Width = -1;
+                        //lvStatistic.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
                         lvStatistic.EndUpdate();
                     }
                 ));
@@ -146,8 +185,8 @@ namespace XMonitor
             timer.AutoReset = true;
             timer.Enabled = true;
 
-            var list = WinPcapDeviceList.Instance;
-            foreach (var dev in list)
+            
+            foreach (var dev in winPcapDeviceList)
             {
                 dev.OnPcapStatistics += new StatisticsModeEventHandler(device_OnPcapStatistics);
                 dev.Open();
@@ -155,6 +194,26 @@ namespace XMonitor
                 dev.Mode = CaptureMode.Statistics;
                 dev.StartCapture();
             }
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            var oldSzie = (Size)Tag;          
+            foreach (Control ctrl in this.Controls)
+            {
+                var tag = (Tuple<Tuple<double, double>, Size>)ctrl.Tag;
+                var pos = tag.Item1;
+                var size = tag.Item2;
+
+                ctrl.Left = (int)(Size.Width * pos.Item1);
+                ctrl.Top = (int)(Size.Height * pos.Item2);
+
+                ctrl.Width = (int)(Size.Width / (float)oldSzie.Width * size.Width);
+                ctrl.Height = (int)(Size.Height / (float)oldSzie.Height * size.Height);
+            }
+
+            
+            
         }
 
     }

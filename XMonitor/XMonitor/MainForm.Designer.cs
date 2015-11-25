@@ -30,17 +30,19 @@
         {
             this.tvProcess = new System.Windows.Forms.TreeView();
             this.lvStatistic = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.device = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.package = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.pps = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.data = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.bps = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // tvProcess
             // 
             this.tvProcess.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.tvProcess.Dock = System.Windows.Forms.DockStyle.Left;
-            this.tvProcess.Location = new System.Drawing.Point(0, 0);
+            this.tvProcess.Location = new System.Drawing.Point(12, 12);
             this.tvProcess.Name = "tvProcess";
-            this.tvProcess.Size = new System.Drawing.Size(717, 559);
+            this.tvProcess.Size = new System.Drawing.Size(519, 473);
             this.tvProcess.TabIndex = 0;
             this.tvProcess.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvProcess_BeforeCollapse);
             this.tvProcess.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvProcess_NodeMouseDoubleClick);
@@ -49,35 +51,55 @@
             // 
             this.lvStatistic.AccessibleName = "";
             this.lvStatistic.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.lvStatistic.Dock = System.Windows.Forms.DockStyle.Right;
+            this.device,
+            this.package,
+            this.pps,
+            this.data,
+            this.bps});
             this.lvStatistic.FullRowSelect = true;
-            this.lvStatistic.Location = new System.Drawing.Point(735, 0);
+            this.lvStatistic.Location = new System.Drawing.Point(537, 12);
             this.lvStatistic.Name = "lvStatistic";
-            this.lvStatistic.Size = new System.Drawing.Size(441, 559);
+            this.lvStatistic.Size = new System.Drawing.Size(617, 473);
             this.lvStatistic.TabIndex = 1;
             this.lvStatistic.UseCompatibleStateImageBehavior = false;
             this.lvStatistic.View = System.Windows.Forms.View.Details;
             // 
-            // columnHeader1
+            // device
             // 
-            this.columnHeader1.Width = 203;
+            this.device.Text = "device";
+            this.device.Width = 77;
             // 
-            // columnHeader2
+            // package
             // 
-            this.columnHeader2.Width = 277;
+            this.package.Text = "package";
+            this.package.Width = 71;
+            // 
+            // pps
+            // 
+            this.pps.Text = "pps";
+            this.pps.Width = 98;
+            // 
+            // data
+            // 
+            this.data.Text = "data (Byte)";
+            this.data.Width = 78;
+            // 
+            // bps
+            // 
+            this.bps.Text = "bps";
+            this.bps.Width = 91;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1176, 559);
+            this.ClientSize = new System.Drawing.Size(1166, 497);
             this.Controls.Add(this.lvStatistic);
             this.Controls.Add(this.tvProcess);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "XMonitor-SEU";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             this.ResumeLayout(false);
 
         }
@@ -86,8 +108,11 @@
 
         private System.Windows.Forms.TreeView tvProcess;
         private System.Windows.Forms.ListView lvStatistic;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader device;
+        private System.Windows.Forms.ColumnHeader package;
+        private System.Windows.Forms.ColumnHeader pps;
+        private System.Windows.Forms.ColumnHeader data;
+        private System.Windows.Forms.ColumnHeader bps;
     }
 }
 

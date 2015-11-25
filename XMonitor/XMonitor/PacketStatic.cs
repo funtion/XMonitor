@@ -7,6 +7,7 @@ using SharpPcap;
 using SharpPcap.WinPcap;
 using PacketDotNet;
 using System.Runtime.CompilerServices;
+using System.Collections.Concurrent;
 
 namespace XMonitor
 {
@@ -20,8 +21,8 @@ namespace XMonitor
     }
     class PacketStatistic
     {
-        
-        private Dictionary<ICaptureDevice, DevicStatistic> devs = new Dictionary<ICaptureDevice, DevicStatistic>();
+
+        public ConcurrentDictionary<ICaptureDevice, DevicStatistic> devs = new ConcurrentDictionary<ICaptureDevice, DevicStatistic>();
         
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void update(StatisticsModeEventArgs e)
@@ -32,7 +33,7 @@ namespace XMonitor
             }
             if(!devs.ContainsKey(e.Device))
             {
-                devs.Add(e.Device, new DevicStatistic());
+                devs.TryAdd(e.Device, new DevicStatistic());
             }
             var dev = devs[e.Device];
             var now = (long)e.Statistics.Timeval.MicroSeconds;
@@ -43,15 +44,19 @@ namespace XMonitor
             }
             else
             {
-                var intevel = now - dev.lastUpdateTime;
+                long intevel = now - dev.lastUpdateTime;
+                if (intevel < 0)
+                    intevel *= -1;
                 dev.pps = (s.RecievedPackets * 1000000) / intevel;
-                dev.bps = (s.RecievedBytes * 8 * 1000000) / intevel;
+                dev.bps = (s.RecievedBytes  * 1000000) / intevel;
+                
+                
             }
             dev.packetReceivedNum += s.RecievedPackets;
             dev.packetReceiveSize += s.RecievedBytes;
         }
 
-        public long packetReceivedNum { get { return devs.Values.Sum(x=>x.packetReceivedNum);} }
+        public long packetReceivedNum { get { return devs.Values.Sum(x => x.packetReceivedNum);} }
         public long packetReceiveSize { get { return devs.Values.Sum(x => x.packetReceiveSize); } }
         
         public long pps { get { return devs.Values.Sum(x=>x.pps);} }
