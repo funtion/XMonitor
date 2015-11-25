@@ -26,6 +26,15 @@ namespace XMonitor
             this.pid = pid;
             this.process = Process.GetProcessById(pid);
             InitializeComponent();
+            Tag = new Size(Size.Width, Size.Height);
+
+            foreach (Control ctrl in this.Controls)
+            {
+
+                ctrl.Tag = new Tuple<Tuple<double, double>, Size>(
+                    new Tuple<double, double>(ctrl.Location.X / (double)Size.Width, ctrl.Location.Y / (double)Size.Height),
+                    ctrl.Size);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -140,6 +149,23 @@ namespace XMonitor
                 var capture = capturedEvens[id];
                 var packetForm = new PacketForm(capture);
                 packetForm.Show();
+            }
+        }
+
+        private void ProcessForm_SizeChanged(object sender, EventArgs e)
+        {
+            var oldSzie = (Size)Tag;
+            foreach (Control ctrl in this.Controls)
+            {
+                var tag = (Tuple<Tuple<double, double>, Size>)ctrl.Tag;
+                var pos = tag.Item1;
+                var size = tag.Item2;
+
+                ctrl.Left = (int)(Size.Width * pos.Item1);
+                ctrl.Top = (int)(Size.Height * pos.Item2);
+
+                ctrl.Width = (int)(Size.Width / (float)oldSzie.Width * size.Width);
+                ctrl.Height = (int)(Size.Height / (float)oldSzie.Height * size.Height);
             }
         }
 

@@ -30,8 +30,7 @@ namespace XMonitor
 
         private PacketStatistic statistic = new PacketStatistic();
         private WinPcapDeviceList winPcapDeviceList = WinPcapDeviceList.Instance;
-        //private List<Tuple<double, double>> factor = new List<Tuple<double, double>>();
-        //private Tuple<double, double> parentSize;
+
         private Point GetTreeViewScrollPos(TreeView treeView)
         {
             return new Point(
@@ -50,13 +49,13 @@ namespace XMonitor
         {
             InitializeComponent();
 
-            //parentSize = new Tuple<double, double>(Size.Width, Size.Height);
+            
             
             Tag = new Size(Size.Width, Size.Height);
             
             foreach (Control ctrl in this.Controls)
             {
-                //factor.Add(new Tuple<double, double>(ctrl.Location.X / (double)Size.Width, ctrl.Location.Y / (double)Size.Height));
+                
                 ctrl.Tag = new Tuple<Tuple<double, double>,Size>(
                     new Tuple<double, double>(ctrl.Location.X / (double)Size.Width, ctrl.Location.Y / (double)Size.Height),
                     ctrl.Size);

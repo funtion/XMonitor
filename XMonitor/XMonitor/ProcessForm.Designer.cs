@@ -36,7 +36,6 @@
             this.srcPort = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.dstIp = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.dstPort = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listView1
@@ -51,7 +50,7 @@
             this.dstPort});
             this.listView1.Location = new System.Drawing.Point(12, 12);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(880, 402);
+            this.listView1.Size = new System.Drawing.Size(1042, 427);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -90,26 +89,16 @@
             this.dstPort.Text = "dstPort";
             this.dstPort.Width = 118;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(940, 28);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // ProcessForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1066, 451);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.listView1);
             this.Name = "ProcessForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ProcessForm_FormClosed);
             this.Load += new System.EventHandler(this.ProcessForm_Load);
+            this.SizeChanged += new System.EventHandler(this.ProcessForm_SizeChanged);
             this.ResumeLayout(false);
 
         }
@@ -117,7 +106,6 @@
         #endregion
 
         private System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ColumnHeader time;
         private System.Windows.Forms.ColumnHeader len;
         private System.Windows.Forms.ColumnHeader type;
