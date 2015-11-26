@@ -63,7 +63,7 @@ namespace XMonitor
             
         }
 
-        private void updateProcessTree(object sender, ElapsedEventArgs e)
+        private void updateView(object sender, ElapsedEventArgs e)
         {
             if (IsDisposed)
                 return;
@@ -87,6 +87,39 @@ namespace XMonitor
                         tvProcess.EndUpdate();
 
                         SetScrollPos((IntPtr)tvProcess.Handle, SB_VERT, pos.Y, true);
+                       
+
+                        lvStatistic.BeginUpdate();
+                        var items = lvStatistic.Items;
+                        items.Clear();
+                        foreach (var v in statistic.devs)
+                        {
+                            var dev = v.Key;
+                            var data = v.Value;
+                            var friendlyName = ((WinPcapDevice)dev).Interface.FriendlyName;
+                            items.Add(new ListViewItem(
+                                    new[] { 
+                                    friendlyName,
+                                    data.packetReceivedNum.ToString(),
+                                    data.pps.ToString(),
+                                    data.packetReceiveSize.ToString(),
+                                    data.bps.ToString()
+                                    }));
+                        }
+
+                        items.Add(new ListViewItem(
+                                    new[] { 
+                                    "Total",
+                                    statistic.packetReceivedNum.ToString(),
+                                    statistic.pps.ToString(),
+                                    statistic.packetReceiveSize.ToString(),
+                                    statistic.bps.ToString()
+                                    }));
+                        lvStatistic.Columns[0].Width = -1;
+                        //lvStatistic.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                        lvStatistic.EndUpdate();
+
+
                     }
                 ));
         }
@@ -129,85 +162,11 @@ namespace XMonitor
             statistic.update(e);
         }
 
-        private void updateStatistic(object sender, ElapsedEventArgs e)
-        {
-            this.Invoke(new Action(
-                    () =>
-                    {
-                        lvStatistic.BeginUpdate();
-                        var items = lvStatistic.Items;
-                        items.Clear();
-                        foreach (var v in statistic.devs)
-                        {
-                            var dev = v.Key;
-                            var data = v.Value;
-                            var friendlyName = ((WinPcapDevice)dev).Interface.FriendlyName;
-                            items.Add(new ListViewItem(
-                                    new[] { 
-                                    friendlyName,
-                                    data.packetReceivedNum.ToString(),
-                                    data.pps.ToString(),
-                                    data.packetReceiveSize.ToString(),
-                                    data.bps.ToString()
-                                    }));
-                        }
-
-                        items.Add(new ListViewItem(
-                                    new[] { 
-                                    "Total",
-                                    statistic.packetReceivedNum.ToString(),
-                                    statistic.pps.ToString(),
-                                    statistic.packetReceiveSize.ToString(),
-                                    statistic.bps.ToString()
-                                    }));
-                        lvStatistic.Columns[0].Width = -1;
-                        //lvStatistic.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                        lvStatistic.EndUpdate();
-                    }
-                ));
-        }
-
+        
         private void device_OnPacketArrival(object sender, CaptureEventArgs e)
         {
             statistic.update(e);
-            if (IsDisposed)
-                return;
-            this.Invoke(new Action(
-                    () =>
-                    {
-                        lvStatistic.BeginUpdate();
-                        var items = lvStatistic.Items;
-                        items.Clear();
-                        foreach (var v in statistic.devs)
-                        {
-                            var dev = v.Key;
-                            var data = v.Value;
-                            var friendlyName = ((WinPcapDevice)dev).Interface.FriendlyName;
-                            items.Add(new ListViewItem(
-                                    new[] { 
-                                    friendlyName,
-                                    data.packetReceivedNum.ToString(),
-                                    data.pps.ToString(),
-                                    data.packetReceiveSize.ToString(),
-                                    data.bps.ToString()
-                                    }));
-                        }
 
-                        items.Add(new ListViewItem(
-                                    new[] { 
-                                    "Total",
-                                    statistic.packetReceivedNum.ToString(),
-                                    statistic.pps.ToString(),
-                                    statistic.packetReceiveSize.ToString(),
-                                    statistic.bps.ToString()
-                                    }));
-                        lvStatistic.Columns[0].Width = -1;
-                        //lvStatistic.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                        lvStatistic.EndUpdate();
-                    }
-                ));
-
-            
         }
 
         private void tvProcess_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
@@ -217,20 +176,18 @@ namespace XMonitor
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            var timer = new System.Timers.Timer(2000);
-            timer.Elapsed += updateProcessTree;
-            timer.Elapsed += updateStatistic;
+            var timer = new System.Timers.Timer(1000);
+            timer.Elapsed += updateView;
+            
             timer.AutoReset = true;
             timer.Enabled = true;
 
             
             foreach (var dev in winPcapDeviceList)
             {
-                //dev.OnPcapStatistics += new StatisticsModeEventHandler(device_OnPcapStatistics);
+               
                 dev.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
                 dev.Open();
-                //dev.Filter = "tcp or udp";
-               
                 dev.StartCapture();
             }
         }

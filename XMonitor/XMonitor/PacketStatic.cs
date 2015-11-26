@@ -22,53 +22,17 @@ namespace XMonitor
     class PacketStatistic
     {
 
-        public ConcurrentDictionary<ICaptureDevice, DevicStatistic> devs = new ConcurrentDictionary<ICaptureDevice, DevicStatistic>();
-        public ConcurrentDictionary<Connection, List<Packet>> packets = new ConcurrentDictionary<Connection,List<Packet>>();
+        public Dictionary<ICaptureDevice, DevicStatistic> devs = new Dictionary<ICaptureDevice, DevicStatistic>();
+        public Dictionary<Connection, List<Packet>> packets = new Dictionary<Connection,List<Packet>>();
         public PacketStatistic()
         {
             var devList = SharpPcap.CaptureDeviceList.Instance;
             foreach(var dev in devList)
             {
-                devs.TryAdd(dev, new DevicStatistic());
+                devs.Add(dev, new DevicStatistic());
             }
         }
-        //[MethodImpl(MethodImplOptions.Synchronized)]
-        //public void update(StatisticsModeEventArgs statisticsModeEventArgs)
-        //{
-        //    if(statisticsModeEventArgs.Device == null)
-        //    {
-        //        return;
-        //    }
-        //    if(!devs.ContainsKey(statisticsModeEventArgs.Device))
-        //    {
-        //        devs.TryAdd(statisticsModeEventArgs.Device, new DevicStatistic());
-        //    }
-        //    var dev = devs[statisticsModeEventArgs.Device];
-        //    var now = (long)statisticsModeEventArgs.Statistics.Timeval.MicroSeconds;
-        //    var s = statisticsModeEventArgs.Statistics;
-        //    if (dev.lastUpdateTime == 0)
-        //    {
-        //        dev.lastUpdateTime = now;
-        //    }
-        //    else
-        //    {
-        //        long intevel = now - dev.lastUpdateTime;
-        //        if (intevel < 0)
-        //            intevel *= -1;
-        //        dev.pps = (s.RecievedPackets * 1000000) / intevel;
-        //        dev.bps = (s.RecievedBytes  * 1000000) / intevel;
-                
-                
-        //    }
-        //    dev.packetReceivedNum += s.RecievedPackets;
-        //    dev.packetReceiveSize += s.RecievedBytes;
-        //    //var con = new Connection(statisticsModeEventArgs.Packet);
-        //    //if(!packets.ContainsKey(con))
-        //    //{
-        //    //    packets.TryAdd(con,new List<Packet>());
-        //    //}
-        //    //packets[con].Add(statisticsModeEventArgs.Packet);
-        //}
+        
 
         public long packetReceivedNum { get { return devs.Values.Sum(x => x.packetReceivedNum);} }
         public long packetReceiveSize { get { return devs.Values.Sum(x => x.packetReceiveSize); } }
@@ -87,7 +51,7 @@ namespace XMonitor
             }
             if (!devs.ContainsKey(dev))
             {
-                devs.TryAdd(dev, new DevicStatistic());
+                devs.Add(dev, new DevicStatistic());
             }
             var statistic = devs[dev];
 
