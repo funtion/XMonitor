@@ -36,6 +36,7 @@
             this.srcPort = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.dstIp = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.dstPort = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // listView1
@@ -50,7 +51,7 @@
             this.dstPort});
             this.listView1.Location = new System.Drawing.Point(12, 12);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1042, 427);
+            this.listView1.Size = new System.Drawing.Size(803, 427);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -59,7 +60,7 @@
             // time
             // 
             this.time.Text = "time";
-            this.time.Width = 93;
+            this.time.Width = 78;
             // 
             // len
             // 
@@ -89,17 +90,27 @@
             this.dstPort.Text = "dstPort";
             this.dstPort.Width = 118;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(830, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(41, 12);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "label1";
+            // 
             // ProcessForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1066, 451);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.listView1);
             this.Name = "ProcessForm";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ProcessForm_FormClosed);
             this.Load += new System.EventHandler(this.ProcessForm_Load);
             this.SizeChanged += new System.EventHandler(this.ProcessForm_SizeChanged);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -113,5 +124,6 @@
         private System.Windows.Forms.ColumnHeader srcPort;
         private System.Windows.Forms.ColumnHeader dstIp;
         private System.Windows.Forms.ColumnHeader dstPort;
+        private System.Windows.Forms.Label label1;
     }
 }

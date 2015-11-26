@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 
 namespace XMonitor
 {
-    class DevicStatistic 
+    public class DevicStatistic 
     {
         public long packetReceivedNum = 0;
         public long packetReceiveSize = 0;
@@ -19,11 +19,11 @@ namespace XMonitor
         public long pps = 0;
         public long bps = 0;
     }
-    class PacketStatistic
+    public class PacketStatistic
     {
 
         public Dictionary<ICaptureDevice, DevicStatistic> devs = new Dictionary<ICaptureDevice, DevicStatistic>();
-        public Dictionary<Connection, List<Packet>> packets = new Dictionary<Connection,List<Packet>>();
+        public Dictionary<Connection, List<RawCapture>> packets = new Dictionary<Connection, List<RawCapture>>();
         public PacketStatistic()
         {
             var devList = SharpPcap.CaptureDeviceList.Instance;
@@ -96,9 +96,9 @@ namespace XMonitor
                     con.pid = -1;
                     if(!packets.ContainsKey(con))
                     {
-                        packets[con] = new List<Packet>();
+                        packets[con] = new List<RawCapture>();
                     }
-                    packets[con].Add(packet);
+                    packets[con].Add(captureEventArgs.Packet);
                     
                     
 
@@ -114,9 +114,9 @@ namespace XMonitor
                     con.pid = -1;
                     if (!packets.ContainsKey(con))
                     {
-                        packets[con] = new List<Packet>();
+                        packets[con] = new List<RawCapture>();
                     }
-                    packets[con].Add(packet);
+                    packets[con].Add(captureEventArgs.Packet);
 
                 }
 

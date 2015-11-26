@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace XMonitor
 {
 
-    struct Connection
+    public struct Connection
     {
         public string type; //tcp udp
         public string srcIp;
@@ -16,6 +16,30 @@ namespace XMonitor
         public string dstPort;
         public int pid;
         //public string status;
+
+        public override bool Equals(object obj)
+        {
+            
+            if (obj.GetType() != typeof(Connection)) return false;
+            var r = (Connection)obj;
+            return type.Equals(r.type) 
+                && srcIp.Equals(r.srcIp) 
+                && srcPort.Equals(r.srcPort)
+                && dstIp.Equals(r.dstIp)
+                && dstPort.Equals(r.dstPort);
+            
+        }
+
+        public override int GetHashCode()
+        {
+            int code = 0;
+            code = code * 31 + type.GetHashCode();
+            code = code * 31 + srcIp.GetHashCode();
+            code = code * 31 + srcPort.GetHashCode();
+            code = code * 31 + dstIp.GetHashCode();
+            code = code * 31 + dstPort.GetHashCode();
+            return code;
+        }
         
     }
 
@@ -70,7 +94,7 @@ namespace XMonitor
                         dstIp = getIp(tokens[2]),
                         dstPort = getPort(tokens[2]),
                         //status = tokens[3],
-                        //pid = Int32.Parse(tokens[4])
+                        pid = Int32.Parse(tokens[4])
                     });
                 }
                 else if(tokens[0] == "UDP")
@@ -83,7 +107,7 @@ namespace XMonitor
                         dstIp = getIp(tokens[2]),
                         dstPort = getPort(tokens[2]),
                         //status = tokens[3],
-                        //pid = Int32.Parse(tokens[3])
+                        pid = Int32.Parse(tokens[3])
                     });
                 }
 

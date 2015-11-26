@@ -149,7 +149,7 @@ namespace XMonitor
         private void tvProcess_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             int pid = Int32.Parse(e.Node.Name);
-            var pf = new ProcessForm(pid);
+            var pf = new ProcessForm(pid, statistic);
             pf.TopLevel = true;
             pf.Show();
 

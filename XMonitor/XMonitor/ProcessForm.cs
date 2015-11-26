@@ -21,10 +21,13 @@ namespace XMonitor
         private const int readTimeoutMilliseconds = 1000;
         private CaptureDeviceList devices = CaptureDeviceList.Instance;
         private List<CaptureEventArgs> capturedEvens = new List<CaptureEventArgs>();
-        public ProcessForm(int pid)
+        private PacketStatistic statistic;
+
+        public ProcessForm(int pid, PacketStatistic statistic)
         {
             this.pid = pid;
             this.process = Process.GetProcessById(pid);
+            this.statistic = statistic;
             InitializeComponent();
             Tag = new Size(Size.Width, Size.Height);
 
@@ -42,101 +45,95 @@ namespace XMonitor
         private void ProcessForm_Load(object sender, EventArgs e)
         {
             Text = string.Format("Process: {0} ({1})", process.ProcessName, process.Id);
+            //TODO ohter info
 
+            var timer = new System.Timers.Timer(1233);
+            timer.Elapsed += updateView;
 
-            var connectsions = new ProcessConnection().getConnectionByPID(pid);
-            var filter = "";
-            foreach (var con in connectsions)
-            {
-
-                filter += string.Format("( {0} and src host {1} and src port {2} and dst host {3} and dst port {4})", con.type.ToLower(), con.srcIp, con.srcPort, con.dstIp, con.dstPort);
-                if (!con.Equals(connectsions.Last()))
-                {
-                    filter += " or ";
-                }
-            }
-
-            foreach (ICaptureDevice dev in devices)
-            {
-                dev.OnPacketArrival += new SharpPcap.PacketArrivalEventHandler(device_OnPacketArrival);
-
-                dev.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
-                dev.Filter = filter;
-                dev.StartCapture();
-            }
-
-
+            timer.AutoReset = true;
+            timer.Enabled = true;
         }
-        private delegate void handlePackageDelegate(CaptureEventArgs packet);
-        private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
+
+        private void updateView(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (IsDisposed)
                 return;
-            this.Invoke(new handlePackageDelegate(handlePackage), packet);
-
-        }
-
-        private void handlePackage(CaptureEventArgs captureEventArgs)
-        {
-            
-            var packet = Packet.ParsePacket(captureEventArgs.Packet.LinkLayerType, captureEventArgs.Packet.Data);
-
-            var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
-            if (ipV4Packet != null)
+            var connectsions = new ProcessConnection().getConnectionByPID(pid);
+            var packets = new List<RawCapture>();
+            foreach (var con in connectsions)
             {
-                var data = new List<string>();
-                var time = captureEventArgs.Packet.Timeval;
-                var tcpPacket = (TcpPacket)packet.Extract(typeof(TcpPacket));
-                if (tcpPacket != null)
-                {
-                    capturedEvens.Add(captureEventArgs);
-                    data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
-                    data.Add(captureEventArgs.Packet.Data.Length.ToString());
-                    data.Add("TCP");
-                    data.Add(ipV4Packet.SourceAddress.ToString());
-                    data.Add(tcpPacket.SourcePort.ToString());
-                    data.Add(ipV4Packet.DestinationAddress.ToString());
-                    data.Add(tcpPacket.DestinationPort.ToString());
-                    listView1.Items.Add(new ListViewItem(data.ToArray()));
-                    listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
+                if (statistic.packets.ContainsKey(con))
+                    packets.AddRange(statistic.packets[con]);
+            }
+            var newData = new List<List<string>>();
 
-                }
-                else
+            foreach (var rawPacket in packets.OrderBy((p) => p.Timeval))
+            {
+                var packet = Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
+
+                var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
+                if (ipV4Packet != null)
                 {
+                    var data = new List<string>();
+                    var time = rawPacket.Timeval;
+                    var tcpPacket = (TcpPacket)packet.Extract(typeof(TcpPacket));
                     var udpPacket = (UdpPacket)packet.Extract(typeof(UdpPacket));
-                    if (udpPacket != null)
+                    if (tcpPacket != null)
                     {
-                        capturedEvens.Add(captureEventArgs);
+                        //capturedEvens.Add(captureEventArgs);
                         data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
-                        data.Add(captureEventArgs.Packet.Data.Length.ToString());
+                        data.Add(rawPacket.Data.Length.ToString());
+                        data.Add("TCP");
+                        data.Add(ipV4Packet.SourceAddress.ToString());
+                        data.Add(tcpPacket.SourcePort.ToString());
+                        data.Add(ipV4Packet.DestinationAddress.ToString());
+                        data.Add(tcpPacket.DestinationPort.ToString());
+
+
+                    }
+                    else if (udpPacket != null)
+                    {
+
+                        //capturedEvens.Add(rawPacket);
+                        data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
+                        data.Add(rawPacket.Data.Length.ToString());
                         data.Add("UDP");
                         data.Add(ipV4Packet.SourceAddress.ToString());
                         data.Add(udpPacket.SourcePort.ToString());
                         data.Add(ipV4Packet.DestinationAddress.ToString());
                         data.Add(udpPacket.DestinationPort.ToString());
-                        listView1.Items.Add(new ListViewItem(data.ToArray()));
-                        listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
+
+
                     }
 
+                    newData.Add(data);
                 }
-
-
                 
-
-
             }
+
+            this.Invoke(new Action(
+                ()=>{
+                    listView1.BeginUpdate();
+                    listView1.Items.Clear();
+                    foreach (var data in newData)
+                    {
+                        listView1.Items.Add(new ListViewItem(data.ToArray()));
+                    }
+                    listView1.Columns[0].Width = -1;
+                    listView1.Columns[3].Width = -1;
+                    listView1.Columns[5].Width = -1;
+                    listView1.EndUpdate();
+                    listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
+
+                    label1.Text = string.Format("{0} packets", listView1.Items.Count);
+
+                }
+            ));
+
+
 
         }
 
-        private void ProcessForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            foreach (ICaptureDevice dev in devices)
-            {
-                //dev.Close();       
-                //dev.StopCapture();
-
-            }
-        }
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
