@@ -20,7 +20,7 @@ namespace XMonitor
         public Process process;
         private const int readTimeoutMilliseconds = 1000;
         private CaptureDeviceList devices = CaptureDeviceList.Instance;
-        private List<CaptureEventArgs> capturedEvens = new List<CaptureEventArgs>();
+        private List<RawCapture> rawCaptures;
         private PacketStatistic statistic;
 
         public ProcessForm(int pid, PacketStatistic statistic)
@@ -58,6 +58,7 @@ namespace XMonitor
         {
             if (IsDisposed)
                 return;
+            rawCaptures = new List<RawCapture>();
             var connectsions = new ProcessConnection().getConnectionByPID(pid);
             var packets = new List<RawCapture>();
             foreach (var con in connectsions)
@@ -80,7 +81,7 @@ namespace XMonitor
                     var udpPacket = (UdpPacket)packet.Extract(typeof(UdpPacket));
                     if (tcpPacket != null)
                     {
-                        //capturedEvens.Add(captureEventArgs);
+                        rawCaptures.Add(rawPacket);
                         data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
                         data.Add(rawPacket.Data.Length.ToString());
                         data.Add("TCP");
@@ -94,7 +95,7 @@ namespace XMonitor
                     else if (udpPacket != null)
                     {
 
-                        //capturedEvens.Add(rawPacket);
+                        rawCaptures.Add(rawPacket);
                         data.Add(string.Format("{0}.{1}", time.Seconds, time.MicroSeconds));
                         data.Add(rawPacket.Data.Length.ToString());
                         data.Add("UDP");
@@ -137,10 +138,12 @@ namespace XMonitor
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count > 0)
+            if (listView1.SelectedItems.Count > 0 )
             {
                 var id = listView1.SelectedIndices[0];
-                var capture = capturedEvens[id];
+                if (id >= rawCaptures.Count)
+                    return;
+                var capture = rawCaptures[id];
                 var packetForm = new PacketForm(capture);
                 packetForm.Show();
             }

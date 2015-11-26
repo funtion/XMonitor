@@ -28,24 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.hexBox1 = new Be.Windows.Forms.HexBox();
             this.SuspendLayout();
             // 
-            // listBox1
+            // hexBox1
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 12;
-            this.listBox1.Location = new System.Drawing.Point(599, 3);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(611, 232);
-            this.listBox1.TabIndex = 0;
+            this.hexBox1.ColumnInfoVisible = true;
+            this.hexBox1.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.hexBox1.LineInfoVisible = true;
+            this.hexBox1.Location = new System.Drawing.Point(12, 12);
+            this.hexBox1.Name = "hexBox1";
+            this.hexBox1.ReadOnly = true;
+            this.hexBox1.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
+            this.hexBox1.Size = new System.Drawing.Size(825, 456);
+            this.hexBox1.StringViewVisible = true;
+            this.hexBox1.TabIndex = 12;
+            this.hexBox1.UseFixedBytesPerLine = true;
+            this.hexBox1.VScrollBarVisible = true;
             // 
             // PacketForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1213, 480);
-            this.Controls.Add(this.listBox1);
+            this.ClientSize = new System.Drawing.Size(858, 480);
+            this.Controls.Add(this.hexBox1);
             this.Name = "PacketForm";
             this.Load += new System.EventHandler(this.PacketForm_Load);
             this.ResumeLayout(false);
@@ -54,6 +60,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox listBox1;
+        private Be.Windows.Forms.HexBox hexBox1;
+
     }
 }
