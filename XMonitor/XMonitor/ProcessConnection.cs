@@ -9,13 +9,14 @@ namespace XMonitor
 
     struct Connection
     {
-        public string type;
-        public string inIp;
-        public string inPort;
-        public string outIp;
-        public string outPort;
-        public string status;
+        public string type; //tcp udp
+        public string srcIp;
+        public string srcPort;
+        public string dstIp;
+        public string dstPort;
         public int pid;
+        //public string status;
+        
     }
 
     class ProcessConnection
@@ -64,12 +65,12 @@ namespace XMonitor
                 {
                     connections.Add(new Connection() { 
                         type = "TCP",
-                        inIp = getIp(tokens[1]),
-                        inPort = getPort(tokens[1]),
-                        outIp = getIp(tokens[2]),
-                        outPort = getPort(tokens[2]),
-                        status = tokens[3],
-                        pid = Int32.Parse(tokens[4])
+                        srcIp = getIp(tokens[1]),
+                        srcPort = getPort(tokens[1]),
+                        dstIp = getIp(tokens[2]),
+                        dstPort = getPort(tokens[2]),
+                        //status = tokens[3],
+                        //pid = Int32.Parse(tokens[4])
                     });
                 }
                 else if(tokens[0] == "UDP")
@@ -77,12 +78,12 @@ namespace XMonitor
                     connections.Add(new Connection()
                     {
                         type = "UDP",
-                        inIp = getIp(tokens[1]),
-                        inPort = getPort(tokens[1]),
-                        outIp = getIp(tokens[2]),
-                        outPort = getPort(tokens[2]),
+                        srcIp = getIp(tokens[1]),
+                        srcPort = getPort(tokens[1]),
+                        dstIp = getIp(tokens[2]),
+                        dstPort = getPort(tokens[2]),
                         //status = tokens[3],
-                        pid = Int32.Parse(tokens[3])
+                        //pid = Int32.Parse(tokens[3])
                     });
                 }
 

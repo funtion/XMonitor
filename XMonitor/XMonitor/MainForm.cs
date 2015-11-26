@@ -127,15 +127,17 @@ namespace XMonitor
         private void device_OnPcapStatistics(object sender, StatisticsModeEventArgs e)
         {
             statistic.update(e);
-            if (IsDisposed)
-                return;
+        }
+
+        private void updateStatistic(object sender, ElapsedEventArgs e)
+        {
             this.Invoke(new Action(
                     () =>
                     {
                         lvStatistic.BeginUpdate();
                         var items = lvStatistic.Items;
                         items.Clear();
-                        foreach(var v in statistic.devs)
+                        foreach (var v in statistic.devs)
                         {
                             var dev = v.Key;
                             var data = v.Value;
@@ -149,7 +151,48 @@ namespace XMonitor
                                     data.bps.ToString()
                                     }));
                         }
-    
+
+                        items.Add(new ListViewItem(
+                                    new[] { 
+                                    "Total",
+                                    statistic.packetReceivedNum.ToString(),
+                                    statistic.pps.ToString(),
+                                    statistic.packetReceiveSize.ToString(),
+                                    statistic.bps.ToString()
+                                    }));
+                        lvStatistic.Columns[0].Width = -1;
+                        //lvStatistic.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                        lvStatistic.EndUpdate();
+                    }
+                ));
+        }
+
+        private void device_OnPacketArrival(object sender, CaptureEventArgs e)
+        {
+            statistic.update(e);
+            if (IsDisposed)
+                return;
+            this.Invoke(new Action(
+                    () =>
+                    {
+                        lvStatistic.BeginUpdate();
+                        var items = lvStatistic.Items;
+                        items.Clear();
+                        foreach (var v in statistic.devs)
+                        {
+                            var dev = v.Key;
+                            var data = v.Value;
+                            var friendlyName = ((WinPcapDevice)dev).Interface.FriendlyName;
+                            items.Add(new ListViewItem(
+                                    new[] { 
+                                    friendlyName,
+                                    data.packetReceivedNum.ToString(),
+                                    data.pps.ToString(),
+                                    data.packetReceiveSize.ToString(),
+                                    data.bps.ToString()
+                                    }));
+                        }
+
                         items.Add(new ListViewItem(
                                     new[] { 
                                     "Total",
@@ -164,12 +207,7 @@ namespace XMonitor
                     }
                 ));
 
-
-        }
-
-        private void device_OnPacketArrival(object sender, CaptureEventArgs e)
-        {
-            throw new NotImplementedException();
+            
         }
 
         private void tvProcess_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
@@ -179,21 +217,24 @@ namespace XMonitor
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            var timer = new System.Timers.Timer(1234);
+            var timer = new System.Timers.Timer(2000);
             timer.Elapsed += updateProcessTree;
+            timer.Elapsed += updateStatistic;
             timer.AutoReset = true;
             timer.Enabled = true;
 
             
             foreach (var dev in winPcapDeviceList)
             {
-                dev.OnPcapStatistics += new StatisticsModeEventHandler(device_OnPcapStatistics);
+                //dev.OnPcapStatistics += new StatisticsModeEventHandler(device_OnPcapStatistics);
+                dev.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
                 dev.Open();
-                dev.Filter = "tcp or udp";
-                dev.Mode = CaptureMode.Statistics;
+                //dev.Filter = "tcp or udp";
+               
                 dev.StartCapture();
             }
         }
+
 
         private void MainForm_SizeChanged(object sender, EventArgs e)
         {

@@ -37,10 +37,7 @@ namespace XMonitor
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
 
-        }
 
         private void ProcessForm_Load(object sender, EventArgs e)
         {
@@ -52,7 +49,7 @@ namespace XMonitor
             foreach (var con in connectsions)
             {
 
-                filter += string.Format("( {0} and src host {1} and src port {2} and dst host {3} and dst port {4})", con.type.ToLower(), con.inIp, con.inPort, con.outIp, con.outPort);
+                filter += string.Format("( {0} and src host {1} and src port {2} and dst host {3} and dst port {4})", con.type.ToLower(), con.srcIp, con.srcPort, con.dstIp, con.dstPort);
                 if (!con.Equals(connectsions.Last()))
                 {
                     filter += " or ";
