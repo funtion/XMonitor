@@ -56,8 +56,7 @@ namespace XMonitor
 
         private void updateView(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (IsDisposed)
-                return;
+            
             rawCaptures = new List<RawCapture>();
             var connectsions = new ProcessConnection().getConnectionByPID(pid);
             var packets = new List<RawCapture>();
@@ -112,6 +111,8 @@ namespace XMonitor
                 
             }
 
+            if (IsDisposed)
+                return;
             this.Invoke(new Action(
                 ()=>{
                     listView1.BeginUpdate();
@@ -124,7 +125,8 @@ namespace XMonitor
                     listView1.Columns[3].Width = -1;
                     listView1.Columns[5].Width = -1;
                     listView1.EndUpdate();
-                    listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
+                    if(listView1.Items.Count > 1)
+                        listView1.Items[listView1.Items.Count - 1].EnsureVisible(); //scroll to end;
 
                     label1.Text = string.Format("{0} packets", listView1.Items.Count);
 

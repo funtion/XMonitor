@@ -63,13 +63,18 @@ namespace XMonitor
             else
             {
                 long intevel = now - statistic.lastUpdateTime;
-                if(intevel < 0 )
+                if (intevel < 0)
                 {
                     intevel *= -1;
                 }
-                statistic.pps = 1000000 / intevel;
-                statistic.bps = (captureEventArgs.Packet.Data.Count() * 1000000) / intevel;
+                if(intevel > 0)
+                {
+                    statistic.pps = 1000000 / intevel;
+                    statistic.bps = (captureEventArgs.Packet.Data.Count() * 1000000) / intevel;
 
+                    statistic.lastUpdateTime = now;
+                }
+                
 
             }
             statistic.packetReceivedNum += 1;

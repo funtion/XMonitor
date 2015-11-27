@@ -15,12 +15,63 @@ using Be.Windows.Forms;
 
 namespace XMonitor
 {
+
+    public struct Field
+    {
+        public string name;
+        public int start;
+        public int len;
+
+        public Field(string name,int start, int len)
+        {
+            this.name = name;
+            this.start = start;
+            this.len = len;
+        }
+
+
+        internal string decode(byte[] p)
+        {
+            Int64 val = 0;
+            int bytePos = start/ 8;
+            int bitPos = 7 - start % 8;
+            for (int i = 0; i < len; i++)
+            {
+                var v = p[bytePos] & ( 1 << (bitPos) );
+                val = val * 2 + ( v == 0 ? 0 : 1);
+                bitPos--;
+                if(bitPos == -1)
+                {
+                    bitPos = 7;
+                    bytePos++;
+                }
+            }
+            
+            return string.Format("0x{0:X4}({0})", val);
+
+
+        }
+    }
     public partial class PacketForm : Form
     {
 
         private RawCapture rawCapture;
 
-       
+        private Field[] fields = {
+                new Field("src port",0,16),
+                new Field("dst port",16,16),
+                new Field("seq number",32,32),
+                new Field("ACK number",64,32),
+                new Field("data offset",96,4),
+                new Field("reserved",100,3),
+                new Field("flags",103,9),
+                new Field("win size",112,16),
+                new Field("checksum",128,16),
+                new Field("URG pointer",144,16),
+                new Field("options",160,-1)
+        };
+
+        
 
         public PacketForm(RawCapture capture)
         {
@@ -39,7 +90,6 @@ namespace XMonitor
             }
             else
             {
-
                 showUdpInfo();
             }
         }
@@ -55,23 +105,32 @@ namespace XMonitor
             var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
             var tcpPacket = (TcpPacket)packet.Extract(typeof(TcpPacket));
 
-            //var items = listBox1.Items;
+            foreach(var field in fields)
+            {
+                var item = new ListViewItem(new[] { field.name, field.decode(tcpPacket.Bytes) });
+                item.Tag = field;
+                lvData.Items.Add(item);
+            }
 
-            //items.Add("TCP PACKET");
-            //var time = rawCapture.Timeval;
-            //items.Add(string.Format("Time : {0} {1}.{2}",time.Date.ToLongDateString(), time.Date.ToLongTimeString(),time.Date.Millisecond));
-            //items.Add(string.Format("src port: {0}", tcpPacket.SourcePort));
-            
-            //ByteViewer bv = new ByteViewer();
-            //byte[] bytes = tcpPacket.Bytes;
-            //bv.SetBytes(bytes);
-            //this.Controls.Add(bv);
 
-            
             hexBox1.ByteProvider = new DynamicByteProvider(tcpPacket.Bytes);
             
+            
 
 
+        }
+
+
+
+        private void lvData_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(lvData.SelectedItems.Count == 0)
+            {
+                hexBox1.Select(0, 0);
+                return;
+            }
+            var field = (Field)lvData.SelectedItems[0].Tag;
+            hexBox1.Select(field.start / 8, field.len / 8 + (field.len%8==0?0:1));
         }
     }
 }

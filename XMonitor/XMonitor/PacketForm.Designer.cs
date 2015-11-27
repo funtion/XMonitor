@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.hexBox1 = new Be.Windows.Forms.HexBox();
+            this.lvData = new System.Windows.Forms.ListView();
+            this.name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.value = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // hexBox1
@@ -40,17 +43,41 @@
             this.hexBox1.Name = "hexBox1";
             this.hexBox1.ReadOnly = true;
             this.hexBox1.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
-            this.hexBox1.Size = new System.Drawing.Size(825, 456);
+            this.hexBox1.Size = new System.Drawing.Size(835, 479);
             this.hexBox1.StringViewVisible = true;
             this.hexBox1.TabIndex = 12;
             this.hexBox1.UseFixedBytesPerLine = true;
             this.hexBox1.VScrollBarVisible = true;
             // 
+            // lvData
+            // 
+            this.lvData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.name,
+            this.value});
+            this.lvData.Location = new System.Drawing.Point(853, 12);
+            this.lvData.Name = "lvData";
+            this.lvData.Size = new System.Drawing.Size(315, 479);
+            this.lvData.TabIndex = 13;
+            this.lvData.UseCompatibleStateImageBehavior = false;
+            this.lvData.View = System.Windows.Forms.View.Details;
+            this.lvData.SelectedIndexChanged += new System.EventHandler(this.lvData_SelectedIndexChanged);
+            // 
+            // name
+            // 
+            this.name.Text = "name";
+            this.name.Width = 139;
+            // 
+            // value
+            // 
+            this.value.Text = "value";
+            this.value.Width = 184;
+            // 
             // PacketForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(858, 480);
+            this.ClientSize = new System.Drawing.Size(1180, 503);
+            this.Controls.Add(this.lvData);
             this.Controls.Add(this.hexBox1);
             this.Name = "PacketForm";
             this.Load += new System.EventHandler(this.PacketForm_Load);
@@ -61,6 +88,9 @@
         #endregion
 
         private Be.Windows.Forms.HexBox hexBox1;
+        private System.Windows.Forms.ListView lvData;
+        private System.Windows.Forms.ColumnHeader name;
+        private System.Windows.Forms.ColumnHeader value;
 
     }
 }

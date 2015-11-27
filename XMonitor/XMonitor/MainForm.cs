@@ -65,17 +65,18 @@ namespace XMonitor
 
         private void updateView(object sender, ElapsedEventArgs e)
         {
+            
+            
             if (IsDisposed)
                 return;
             this.Invoke(new Action(
                     () =>
                     {
-                        
                         List<Proc> tree = Proc.getProcessTree();
                         var pos = new Point(
-                            GetScrollPos((int)tvProcess.Handle, SB_HORZ),
-                            GetScrollPos((int)tvProcess.Handle, SB_VERT)
-                            );
+                                        GetScrollPos((int)tvProcess.Handle, SB_HORZ),
+                                        GetScrollPos((int)tvProcess.Handle, SB_VERT)
+                                        );
                         tvProcess.BeginUpdate();
                         tvProcess.Nodes.Clear();
                         foreach (Proc proc in tree)
@@ -83,7 +84,6 @@ namespace XMonitor
                             tvProcess.Nodes.Add(buildTreeNode(proc));
                         }
                         tvProcess.ExpandAll();
-
                         tvProcess.EndUpdate();
 
                         SetScrollPos((IntPtr)tvProcess.Handle, SB_VERT, pos.Y, true);
@@ -116,10 +116,8 @@ namespace XMonitor
                                     statistic.bps.ToString()
                                     }));
                         lvStatistic.Columns[0].Width = -1;
-                        //lvStatistic.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
                         lvStatistic.EndUpdate();
-
-
                     }
                 ));
         }
