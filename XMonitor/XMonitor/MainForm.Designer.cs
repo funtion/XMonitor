@@ -1,4 +1,5 @@
-﻿namespace XMonitor
+﻿using System;
+namespace XMonitor
 {
     partial class MainForm
     {
@@ -16,6 +17,20 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+            }
+            foreach (var dev in winPcapDeviceList)
+            {
+                try
+                {
+
+                    dev.StopCapture();
+                    dev.Close();
+                }
+                catch (Exception e)
+                {
+
+                    //pass
+                }
             }
             base.Dispose(disposing);
         }

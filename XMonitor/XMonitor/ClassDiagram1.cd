@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="XMonitor.MainForm">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAACACAAABAAAACQEQBDIgISAEABAAARQBCAAEA=</HashCode>
+      <FileName>MainForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.PacketForm">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACEAAAIACAAAgAAAACAAAAKAAAEACAAAAQIAAAAQAA=</HashCode>
+      <FileName>PacketForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.DevicStatistic">
+    <Position X="5.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAACAABQAAgAAA=</HashCode>
+      <FileName>PacketStatic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.PacketStatistic">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAACAABQAAkAAA=</HashCode>
+      <FileName>PacketStatic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.Proc">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACIAAAAAAAQAAAAAACAQAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Proc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.ProcessConnection">
+    <Position X="4" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIICAAAAAAAgA=</HashCode>
+      <FileName>ProcessConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.ProcessForm">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAABAAAEACAAIBIARACAAQICIAABGEAAAAAAAIQAAAA=</HashCode>
+      <FileName>ProcessForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.Program">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.Properties.Resources" Collapsed="true">
+    <Position X="7.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMonitor.Properties.Settings" Collapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="XMonitor.Field">
+    <Position X="7.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAACAAAAAAAAEAABAAAAAAAAAAAA=</HashCode>
+      <FileName>PacketForm.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="XMonitor.Connection">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAIAwAAAAAAAAEABAIAAAAAAAAQAAAA=</HashCode>
+      <FileName>ProcessConnection.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

@@ -57,7 +57,7 @@ namespace XMonitor
 
         private RawCapture rawCapture;
 
-        private Field[] fields = {
+        private Field[] tcpFields = {
                 new Field("src port",0,16),
                 new Field("dst port",16,16),
                 new Field("seq number",32,32),
@@ -69,6 +69,14 @@ namespace XMonitor
                 new Field("checksum",128,16),
                 new Field("URG pointer",144,16),
                 new Field("options",160,-1)
+        };
+
+        private Field[] udpFields = { 
+                new Field("src port",0, 16),
+                new Field("dst port",16, 16),
+                new Field("length",32,16),
+                new Field("check sum",48,16)
+    
         };
 
         
@@ -96,7 +104,19 @@ namespace XMonitor
 
         private void showUdpInfo()
         {
-            throw new NotImplementedException();
+            var packet = Packet.ParsePacket(rawCapture.LinkLayerType, rawCapture.Data);
+            var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
+            var udpPacket = (UdpPacket)packet.Extract(typeof(UdpPacket));
+
+            foreach (var field in udpFields)
+            {
+                var item = new ListViewItem(new[] { field.name, field.decode(udpPacket.Bytes) });
+                item.Tag = field;
+                lvData.Items.Add(item);
+            }
+
+
+            hexBox1.ByteProvider = new DynamicByteProvider(udpPacket.Bytes);
         }
 
         private void showTcpInfo()
@@ -105,7 +125,7 @@ namespace XMonitor
             var ipV4Packet = (IPv4Packet)packet.Extract(typeof(IPv4Packet));
             var tcpPacket = (TcpPacket)packet.Extract(typeof(TcpPacket));
 
-            foreach(var field in fields)
+            foreach(var field in tcpFields)
             {
                 var item = new ListViewItem(new[] { field.name, field.decode(tcpPacket.Bytes) });
                 item.Tag = field;
