@@ -38,7 +38,7 @@ namespace XMonitor
             var pc = new ProcessConnection();
             foreach(var con in pc.connections)
             {
-                if(procs.ContainsKey(con.pid))
+                if(con.pid != 0 && procs.ContainsKey(con.pid))
                     procs[con.pid].connections.Add(con);
             }
 
