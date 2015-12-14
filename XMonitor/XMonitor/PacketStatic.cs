@@ -24,6 +24,7 @@ namespace XMonitor
 
         public Dictionary<ICaptureDevice, DevicStatistic> devs = new Dictionary<ICaptureDevice, DevicStatistic>();
         public Dictionary<Connection, List<RawCapture>> packets = new Dictionary<Connection, List<RawCapture>>();
+        public Dictionary<Connection, int> dataSize = new Dictionary<Connection, int>();
         public PacketStatistic()
         {
             var devList = SharpPcap.CaptureDeviceList.Instance;
@@ -31,6 +32,12 @@ namespace XMonitor
             {
                 devs.Add(dev, new DevicStatistic());
             }
+        }
+        public Dictionary<Connection, int> refreshData()
+        {
+            var tmp = new Dictionary<Connection, int>(dataSize);
+            dataSize.Clear();
+            return tmp;
         }
         
 
@@ -104,7 +111,10 @@ namespace XMonitor
                         packets[con] = new List<RawCapture>();
                     }
                     packets[con].Add(captureEventArgs.Packet);
-                    
+                    if(!dataSize.ContainsKey(con)){
+                        dataSize[con] = 0;
+                    }
+                    dataSize[con] += captureEventArgs.Packet.Data.Count();
                     
 
                 }
@@ -122,6 +132,11 @@ namespace XMonitor
                         packets[con] = new List<RawCapture>();
                     }
                     packets[con].Add(captureEventArgs.Packet);
+                    if (!dataSize.ContainsKey(con))
+                    {
+                        dataSize[con] = 0;
+                    }
+                    dataSize[con] += captureEventArgs.Packet.Data.Count();
 
                 }
 

@@ -49,7 +49,7 @@ namespace XMonitor
             this.package = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.pps = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.data = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.bps = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Bps = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // tvProcess
@@ -70,7 +70,7 @@ namespace XMonitor
             this.package,
             this.pps,
             this.data,
-            this.bps});
+            this.Bps});
             this.lvStatistic.FullRowSelect = true;
             this.lvStatistic.Location = new System.Drawing.Point(537, 12);
             this.lvStatistic.Name = "lvStatistic";
@@ -99,10 +99,10 @@ namespace XMonitor
             this.data.Text = "data (Byte)";
             this.data.Width = 78;
             // 
-            // bps
+            // Bps
             // 
-            this.bps.Text = "bps";
-            this.bps.Width = 91;
+            this.Bps.Text = "Bps";
+            this.Bps.Width = 91;
             // 
             // MainForm
             // 
@@ -127,7 +127,7 @@ namespace XMonitor
         private System.Windows.Forms.ColumnHeader package;
         private System.Windows.Forms.ColumnHeader pps;
         private System.Windows.Forms.ColumnHeader data;
-        private System.Windows.Forms.ColumnHeader bps;
+        private System.Windows.Forms.ColumnHeader Bps;
     }
 }
 

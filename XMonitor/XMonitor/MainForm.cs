@@ -69,10 +69,12 @@ namespace XMonitor
             
             if (IsDisposed)
                 return;
+            List<Proc> tree = Proc.getProcessTree(statistic);
             this.Invoke(new Action(
                     () =>
                     {
-                        List<Proc> tree = Proc.getProcessTree();
+                        
+                        
                         var pos = new Point(
                                         GetScrollPos((int)tvProcess.Handle, SB_HORZ),
                                         GetScrollPos((int)tvProcess.Handle, SB_VERT)
@@ -132,7 +134,8 @@ namespace XMonitor
             }
             else
             {
-                info = string.Format("{0} (pid :{1} - {2} connections )", proc.processName, proc.processId, proc.connections.Count);
+                
+                info = string.Format("{0} (pid :{1} - {2} connections - {3} Byte/s )", proc.processName, proc.processId, proc.connections.Count,proc.speed);
             }
             var res = new TreeNode(info);
             res.Name = string.Format("{0}", proc.processId);
@@ -154,12 +157,6 @@ namespace XMonitor
             
             
         }
-
-        private void device_OnPcapStatistics(object sender, StatisticsModeEventArgs e)
-        {
-            statistic.update(e);
-        }
-
         
         private void device_OnPacketArrival(object sender, CaptureEventArgs e)
         {

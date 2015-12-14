@@ -13,11 +13,13 @@ namespace XMonitor
     {
         public int processId,parentId;
         public string processName;
+        public int speed;
+        
         public List<Proc> children = new List<Proc>();
         public List<Connection> connections = new List<Connection>();
 
 
-        public static List<Proc> getProcessTree()
+        public static List<Proc> getProcessTree(PacketStatistic statistic)
         {
 
             var relations = new Dictionary<int, List<int>>();
@@ -35,11 +37,20 @@ namespace XMonitor
 
             }
 
+            var dataCount = statistic.refreshData();
             var pc = new ProcessConnection();
             foreach(var con in pc.connections)
             {
-                if(con.pid != 0 && procs.ContainsKey(con.pid))
+                if (con.pid != 0 && procs.ContainsKey(con.pid)) {
                     procs[con.pid].connections.Add(con);
+                    if (dataCount.ContainsKey(con))
+                    {
+                        procs[con.pid].speed += dataCount[con];
+                    }
+                    
+                   
+                }
+                    
             }
 
             var children = new HashSet<int>();
@@ -67,6 +78,8 @@ namespace XMonitor
             }
             return result;
         }
+
+
 
     }
 
